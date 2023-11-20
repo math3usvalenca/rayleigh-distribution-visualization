@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>Distribuição de Rayleigh</h1>
+
+        <p>
+            A distribuição de Rayleigh é um distribuição para variáveis aleatórias contínuas com valores positivos. É
+            amplamente utilizada para:
+        </p>
+        <ul>
+            <li>Na teoria das comunicações, para modelar múltiplos caminhos de sinais densos e dispersos que chegam a um
+                receptor.</li>
+            <li>Nas ciências físicas, para modelar a velocidade do vento, altura das ondas e radiação sonora/luminosa.
+            </li>
+            <li>Na engenharia, para medir a vida útil de um objeto, onde a vida útil depende da idade do objeto. Por
+                exemplo: resistores, transformadores e capacitores em conjuntos de radares de aeronaves. </li>
+            <li>Na ciência de imagens médicas, para modelar a variação de ruído em imagens de ressonância magnética.
+            </li>
+        </ul>
+
+        <p>
+            Em resumo, as distribuições de Rayleigh são utilizadas para descrever o nível de um sinal recebido e prever
+            qual seria a maior altura relativa de onda esperada para o total de ondas individuais observadas.
+        </p>
+    </header>
+
+
+    <div>
+        <p style="font-style: oblique;">Por ser uma distribuição contínua, não há uma função de massa de probabilidade, apenas a função de densidade
+            de probabilidade, dada pela
+            seguinte fórmula:
+        </p>
+        <img width="400"
+            src="https://wikimedia.org/api/rest_v1/media/math/render/svg/8a06343fb89f74d188c25aef4931739d6c488467"
+            alt="">
+        <p>
+            A função recebe dois parâmetros: a variável aleatória x e um σ (scale). <b>À medida que o σ aumenta, a
+            distribuição
+            fica mais ampla e plana.</b>
+        </p>
+
+        <p>
+            Já a fórmula da função de probabilidade acumulada é dada por:
+        </p>
+        <img width="300" src="https://wikimedia.org/api/rest_v1/media/math/render/svg/c4761814d19f798a8d75ee5c6d92b1cf85096dc6" alt="">
+    </div>
+    </div>
+
+    <h2>Visualizando as distribuições</h2>
+
+    <p>Escolha um valor de σ (sigma):</p>
+
+    <form id="form" action="">
+        <select name="options">
+            <option value="0.5">0.5</option>
+            <option value="1.0">1.0</option>
+            <option value="2.0">2.0</option>
+            <option value="3.0">3.0</option>
+            <option value="4.0">4.0</option>
+        </select>
+        <button>Plotar</button>
+    </form>
+
+    <div id="container" style="width:100%; height:400px;"></div>
+    <div id="container2"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script src="/js/themes/gray.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js">
+
+    </script>
+
+    <script>
+
+
+
+        document.getElementById('form').addEventListener('submit', function submit(e) {
+            e.preventDefault()
+
+            form = document.getElementById('form')
+            const formData = new FormData(form)
+            for (const [key, value] of formData) {
+                console.log('teste', key, value)
+                plotPDF(Number(value))
+                plotCDF(Number(value))
+            }
+        })
+
+
+        let data = [];
+
+        function rayleighPDF(x, sigma) {
+            if (x < 0) {
+                return 0;
+            }
+            return (x / (sigma ** 2)) * Math.exp(-0.5 * ((x / sigma) ** 2));
+        }
+
+        function rayleighCDF(x, sigma) {
+            if (x < 0) {
+                return 0;
+            }
+            return  1 - Math.exp(-0.5 * ((x / sigma) ** 2));
+        }
+
+
+        const series = []
+
+        function plotPDF(scale) {
+            const  sigma = scale
+            data = []
+            for (let x = 0; x <= 10; x += 0.01) {
+                const y = rayleighPDF(x, sigma);
+                data.push([x, y]);
+            }
+            series.push({
+                name:`σ = ${scale}`,
+                data:data
+            })
+            console.log(series)
+
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'area'
+                },
+                title: {
+                    text: 'Densidade de Probabilidade da Distribuição de Rayleigh',
+                },
+                series:series
+                // series: [{
+                //     name: 'Densidade de Probabilidade',
+                //     data: data,
+                //     color: '#0e5661',
+                // },
+                // ],
+            },
+            );
+        }
+
+        let cdf = []
+        const series2 = []
+        function plotCDF(scale) {
+
+            const sigma = scale
+            cdf = []
+            for (let x = 0; x <= 10; x += 0.01) {
+                //const y = 1 - Math.exp(-0.5 * (x / 2) ** 2)
+                const y =  rayleighCDF(x,sigma)
+                cdf.push([x, y]);
+            }
+
+
+            series2.push({
+                name:`σ = ${scale}`,
+                data:cdf
+            })
+
+            Highcharts.chart('container2', {
+                chart: {
+                    type: 'area'
+                },
+                title: {
+                    text: 'Probabilidade acumulada da Distribuição de Rayleigh',
+                },
+                series:series2
+                // series: [{
+                //     name: 'Densidade de Probabilidade',
+                //     data: cdf,
+                //     color: '#0e5661',
+                // },
+                // ],
+            },
+            );
+        }
+       
+    </script>
+</body>
+
+</html>
